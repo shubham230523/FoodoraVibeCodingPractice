@@ -1,25 +1,29 @@
 {
   "expo": {
-    "name": "zomato",
-    "slug": "zomato",
+    "name": "Foodora",
+    "slug": "foodora",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "zomato",
-    "userInterfaceStyle": "automatic",
+    "scheme": "foodora",
+    "userInterfaceStyle": "light",
+    "statusBar": {
+      "barStyle": "dark-content",
+      "backgroundColor": "transparent",
+      "translucent": true
+    },
     "ios": {
-      "icon": "./assets/expo.icon"
+      "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "backgroundColor": "#FF5A5F",
+        "foregroundImage": "./assets/images/icon.png"
       },
-      "predictiveBackGestureEnabled": false
+      "package": "com.foodora.app"
     },
     "web": {
+      "bundler": "metro",
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
@@ -28,11 +32,12 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "backgroundColor": "#FF5A5F",
+          "image": "./assets/images/icon.png",
+          "imageWidth": 200
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,

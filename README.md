@@ -1,56 +1,126 @@
-# Welcome to your Expo app 👋
+# Foodora - Good Food. Delivered. 🍔🚀
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Foodora is a premium, production-quality food delivery application built with **React Native** and **Expo**. Designed with a focus on seamless user experience, performance, and a modern design system, Foodora offers a complete journey from restaurant discovery to real-time order tracking.
 
-## Get started
+---
 
-1. Install dependencies
+## ✨ Features
 
-   ```bash
-   npm install
-   ```
+- **📍 Smart Discovery**: Discover top-rated restaurants near you with a curated home feed, categorized by cuisines and special offers.
+- **🔍 Advanced Search**: Fast, debounced search for finding your favorite dishes, restaurants, or cuisines.
+- **🍱 Detailed Menus**: Browse sectioned menus with high-quality imagery and detailed dish information.
+- **🛠️ Customization Engine**: Personalize your meals with a robust customization system (size, add-ons, toppings).
+- **🛒 Dynamic Cart**: Smart cart management that handles multi-item orders and prevents cross-restaurant conflicts.
+- **💳 Secure Checkout**: Multiple mock payment methods (UPI, Card, COD) with a detailed bill breakdown and coupon support.
+- **🛰️ Real-time Tracking**: Monitor your order status with a live timeline from placement to delivery.
+- **👤 Profile & History**: Manage saved addresses, view order history, and maintain your favorites.
 
-2. Start the app
+---
 
-   ```bash
-   npx expo start
-   ```
+## 📱 Screenshots
 
-In the output, you'll find options to open the app in a
+<p align="center">
+  <img src="Screenshots/Screenshot_20260816_181557_Expo%20Go.jpg" width="30%" />
+  <img src="Screenshots/Screenshot_20260816_181611_Expo%20Go.jpg" width="30%" />
+  <img src="Screenshots/Screenshot_20260816_181621_Expo%20Go.jpg" width="30%" />
+</p>
+<p align="center">
+  <i>Home Discovery | Featured Restaurants | Smart Search</i>
+</p>
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+<p align="center">
+  <img src="Screenshots/Screenshot_20260816_181627_Expo%20Go.jpg" width="30%" />
+  <img src="Screenshots/Screenshot_20260816_181632_Expo%20Go.jpg" width="30%" />
+  <img src="Screenshots/Screenshot_20260816_181640_Expo%20Go.jpg" width="30%" />
+</p>
+<p align="center">
+  <i>Restaurant Menu | Dish Customization | Dynamic Cart</i>
+</p>
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+<p align="center">
+  <img src="Screenshots/Screenshot_20260816_181648_Expo%20Go.jpg" width="30%" />
+  <img src="Screenshots/Screenshot_20260816_181659_Expo%20Go.jpg" width="30%" />
+  <img src="Screenshots/Screenshot_20260816_181707_Expo%20Go.jpg" width="30%" />
+</p>
+<p align="center">
+  <i>Secure Checkout | Order Tracking | Order History</i>
+</p>
 
-## Get a fresh project
+<p align="center">
+  <img src="Screenshots/Screenshot_20260816_181904_Expo%20Go.jpg" width="30%" />
+</p>
+<p align="center">
+  <i>User Profile Management</i>
+</p>
 
-When you're ready, run:
+---
 
-```bash
-npm run reset-project
+## 🛠️ Tech Stack
+
+- **Framework**: [Expo](https://expo.dev/) (SDK 57) / [React Native](https://reactnative.dev/)
+- **Navigation**: [Expo Router](https://docs.expo.dev/router/introduction/) (File-based routing)
+- **State Management**: [Zustand](https://github.com/pmndrs/zustand)
+- **Data Fetching**: [TanStack Query](https://tanstack.com/query/latest) (React Query)
+- **Persistence**: [Expo Secure Store](https://docs.expo.dev/versions/latest/sdk/secure-store/)
+- **Styling**: React Native StyleSheet with a centralized Design System
+- **Icons**: [Lucide React Native](https://lucide.dev/guide/packages/lucide-react-native)
+- **Validation**: [Zod](https://zod.dev/) + [React Hook Form](https://react-hook-form.com/)
+- **Animations**: [React Native Reanimated](https://docs.swmansion.com/react-native-reanimated/)
+
+---
+
+## 📂 Project Structure
+
+```text
+src/
+ ├── app/              # Expo Router routes (Tabs, Stacks, Modals)
+ ├── components/       # Reusable UI components (Common, Restaurant, Food, etc.)
+ ├── features/         # Feature-based modules (Home, Search, Cart, Checkout)
+ ├── store/            # Zustand state stores
+ ├── services/         # API clients and storage services
+ ├── types/            # TypeScript interfaces and enums
+ ├── theme/            # Centralized design tokens (Colors, Typography, Spacing)
+ └── utils/            # Helper functions and business logic
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-### Other setup steps
+## 🚀 Getting Started
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+### 1. Clone the repository
+```bash
+git clone https://github.com/your-username/foodora.git
+cd foodora
+```
 
-## Learn more
+### 2. Install dependencies
+```bash
+npm install
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+### 3. Start the application
+```bash
+npx expo start
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Use the **Expo Go** app on your phone or an emulator to view the app.
 
-## Join the community
+---
 
-Join our community of developers creating universal apps.
+## 🧪 Testing
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+The project includes unit tests for core business logic (price calculations, taxes, etc.).
+
+```bash
+npm test
+```
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+<p align="center">Made with ❤️ for Foodies by Shubham</p>

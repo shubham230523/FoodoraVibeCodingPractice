@@ -20,37 +20,37 @@ Foodora is a premium, production-quality food delivery application built with **
 ## 📱 Screenshots
 
 <p align="center">
-  <img src="Screenshots/Screenshot_20260816_181557_Expo%20Go.jpg" width="30%" />
-  <img src="Screenshots/Screenshot_20260816_181611_Expo%20Go.jpg" width="30%" />
-  <img src="Screenshots/Screenshot_20260816_181621_Expo%20Go.jpg" width="30%" />
+  <img src="Screenshots/SplashScreen.jpg" width="30%" />
+  <img src="Screenshots/Home.jpg" width="30%" />
+  <img src="Screenshots/SearchResultScreen.jpg" width="30%" />
 </p>
 <p align="center">
-  <i>Home Discovery | Featured Restaurants | Smart Search</i>
-</p>
-
-<p align="center">
-  <img src="Screenshots/Screenshot_20260816_181627_Expo%20Go.jpg" width="30%" />
-  <img src="Screenshots/Screenshot_20260816_181632_Expo%20Go.jpg" width="30%" />
-  <img src="Screenshots/Screenshot_20260816_181640_Expo%20Go.jpg" width="30%" />
-</p>
-<p align="center">
-  <i>Restaurant Menu | Dish Customization | Dynamic Cart</i>
+  <i>Splash Screen | Discovery | Search Results</i>
 </p>
 
 <p align="center">
-  <img src="Screenshots/Screenshot_20260816_181648_Expo%20Go.jpg" width="30%" />
-  <img src="Screenshots/Screenshot_20260816_181659_Expo%20Go.jpg" width="30%" />
-  <img src="Screenshots/Screenshot_20260816_181707_Expo%20Go.jpg" width="30%" />
+  <img src="Screenshots/RestaurantDetail.jpg" width="30%" />
+  <img src="Screenshots/FoodAddedToCart.jpg" width="30%" />
+  <img src="Screenshots/EmptyCart.jpg" width="30%" />
 </p>
 <p align="center">
-  <i>Secure Checkout | Order Tracking | Order History</i>
+  <i>Restaurant Detail | Item Customization | Empty Cart State</i>
 </p>
 
 <p align="center">
-  <img src="Screenshots/Screenshot_20260816_181904_Expo%20Go.jpg" width="30%" />
+  <img src="Screenshots/CartScreen.jpg" width="30%" />
+  <img src="Screenshots/Checkout.jpg" width="30%" />
+  <img src="Screenshots/OrderScreen.jpg" width="30%" />
 </p>
 <p align="center">
-  <i>User Profile Management</i>
+  <i>Review Cart | Secure Checkout | Live Order Tracking</i>
+</p>
+
+<p align="center">
+  <img src="Screenshots/MyOrders.jpg" width="30%" />
+</p>
+<p align="center">
+  <i>Order History</i>
 </p>
 
 ---

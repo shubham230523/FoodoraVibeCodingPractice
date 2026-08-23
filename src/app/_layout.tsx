@@ -14,6 +14,7 @@ export default function RootLayout() {
         <Stack
           screenOptions={{
             headerShown: false,
+            headerTitle: '',
             headerStyle: {
               backgroundColor: theme.colors.background,
             },
@@ -24,8 +25,7 @@ export default function RootLayout() {
             headerShadowVisible: false,
           }}
         >
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="splash" options={{ headerShown: false }} />
+          <Stack.Screen name="index" options={{ headerShown: false, title: '', headerTitle: '' }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="restaurant/[id]" options={{ title: 'Restaurant', headerShown: false }} />
           <Stack.Screen name="food/[id]" options={{ title: 'Food Item', presentation: 'modal', headerShown: true }} />

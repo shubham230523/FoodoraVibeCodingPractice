@@ -91,7 +91,7 @@ src/
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/your-username/foodora.git
+git clone https://github.com/shubham230523/FoodoraVibeCodingPractice.git
 cd foodora
 ```
 

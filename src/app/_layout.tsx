@@ -13,6 +13,7 @@ export default function RootLayout() {
         <StatusBar style="dark" translucent backgroundColor="transparent" />
         <Stack
           screenOptions={{
+            headerShown: false,
             headerStyle: {
               backgroundColor: theme.colors.background,
             },
@@ -23,13 +24,14 @@ export default function RootLayout() {
             headerShadowVisible: false,
           }}
         >
+          <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="splash" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="restaurant/[id]" options={{ title: 'Restaurant', headerShown: false }} />
-          <Stack.Screen name="food/[id]" options={{ title: 'Food Item', presentation: 'modal' }} />
-          <Stack.Screen name="cart" options={{ title: 'Cart' }} />
-          <Stack.Screen name="address" options={{ title: 'Select Address' }} />
-          <Stack.Screen name="checkout" options={{ title: 'Checkout' }} />
+          <Stack.Screen name="food/[id]" options={{ title: 'Food Item', presentation: 'modal', headerShown: true }} />
+          <Stack.Screen name="cart" options={{ title: 'Cart', headerShown: true }} />
+          <Stack.Screen name="address" options={{ title: 'Select Address', headerShown: true }} />
+          <Stack.Screen name="checkout" options={{ title: 'Checkout', headerShown: true }} />
           <Stack.Screen name="order/[id]" options={{ title: 'Order Tracking', headerShown: false }} />
         </Stack>
       </QueryClientProvider>

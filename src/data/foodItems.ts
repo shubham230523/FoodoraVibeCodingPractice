@@ -162,6 +162,94 @@ export const foodItems: FoodItem[] = [
       isVeg: false
   },
   {
+    id: 'food-13-1',
+    restaurantId: 'res-3',
+    name: 'Egg Biryani',
+    description: 'Flavorful biryani with hard-boiled eggs and aromatic spices.',
+    image: 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=400&sig=egg-biryani',
+    price: 249,
+    category: 'Biryani',
+    isVeg: false,
+    rating: 4.3
+  },
+  {
+    id: 'food-13-2',
+    restaurantId: 'res-3',
+    name: 'Mutton Dum Biryani',
+    description: 'Rich and hearty biryani with slow-cooked tender mutton.',
+    image: 'https://images.unsplash.com/photo-1633945274405-b6c8069047b0?w=400',
+    price: 499,
+    category: 'Biryani',
+    isVeg: false,
+    rating: 4.8
+  },
+  {
+    id: 'food-13-3',
+    restaurantId: 'res-3',
+    name: 'Veg Hyderabadi Biryani',
+    description: 'Aromatic basmati rice cooked with assorted vegetables and spices.',
+    image: 'https://images.unsplash.com/photo-1563379091339-03b11adbc936?w=400&sig=veg-biryani',
+    price: 279,
+    category: 'Biryani',
+    isVeg: true,
+    rating: 4.4
+  },
+  {
+    id: 'food-13-4',
+    restaurantId: 'res-11',
+    name: 'Lucknowi Chicken Biryani',
+    description: 'Mildly spiced, fragrant biryani in the Awadhi style.',
+    image: 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=400&sig=lucknowi-biryani',
+    price: 369,
+    category: 'Biryani',
+    isVeg: false,
+    rating: 4.6
+  },
+  {
+    id: 'food-13-5',
+    restaurantId: 'res-11',
+    name: 'Kolkata Biryani',
+    description: 'Unique biryani with potatoes and boiled eggs.',
+    image: 'https://images.unsplash.com/photo-1563379091339-03b11adbc936?w=400&sig=kolkata-biryani',
+    price: 329,
+    category: 'Biryani',
+    isVeg: false,
+    rating: 4.5
+  },
+  {
+    id: 'food-13-6',
+    restaurantId: 'res-19',
+    name: 'Tandoori Chicken Biryani',
+    description: 'Biryani served with juicy tandoori chicken pieces.',
+    image: 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=400&sig=tandoori-biryani',
+    price: 389,
+    category: 'Biryani',
+    isVeg: false,
+    rating: 4.7
+  },
+  {
+    id: 'food-13-7',
+    restaurantId: 'res-19',
+    name: 'Mushroom Biryani',
+    description: 'Vegetarian delight with earthy mushrooms and long-grain rice.',
+    image: 'https://images.unsplash.com/photo-1563379091339-03b11adbc936?w=400&sig=mushroom-biryani',
+    price: 269,
+    category: 'Biryani',
+    isVeg: true,
+    rating: 4.2
+  },
+  {
+    id: 'food-13-8',
+    restaurantId: 'res-23',
+    name: 'Afghani Pulao',
+    description: 'Mildly sweet and nutty pulao with tender meat chunks.',
+    image: 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=400&sig=afghani-pulao',
+    price: 429,
+    category: 'Biryani',
+    isVeg: false,
+    rating: 4.6
+  },
+  {
       id: 'food-13',
       restaurantId: 'res-3',
       name: 'Mutton Seekh Kebab',

@@ -165,7 +165,7 @@ export const restaurants: Restaurant[] = [
       image: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=800',
       rating: 4.2,
       reviewCount: 950,
-      cuisines: ['North Indian', 'Curries'],
+      cuisines: ['North Indian', 'Curries', 'Biryani'],
       deliveryTime: 35,
       priceForTwo: 600,
       distance: 2.8,
@@ -173,6 +173,38 @@ export const restaurants: Restaurant[] = [
       address: 'Main Market, Block C',
       description: 'Traditional Indian curries with a twist.',
       offers: []
+  },
+  {
+    id: 'res-11-2',
+    name: 'Biryani Blues',
+    image: 'https://images.unsplash.com/photo-1563379091339-03b11adbc936?w=800',
+    rating: 4.4,
+    reviewCount: 1800,
+    cuisines: ['Biryani', 'Hyderabadi', 'Lucknowi'],
+    deliveryTime: 25,
+    priceForTwo: 500,
+    distance: 1.5,
+    isPureVeg: false,
+    address: 'City Center Mall, Food Court',
+    description: 'The ultimate biryani destination.',
+    offers: [
+      { id: 'off-bb-1', title: '₹125 OFF', description: 'On orders above ₹500', code: 'BLUES125', flatDiscount: 125, minOrderAmount: 500 }
+    ]
+  },
+  {
+    id: 'res-11-3',
+    name: 'Paradise Biryani',
+    image: 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=800',
+    rating: 4.8,
+    reviewCount: 5000,
+    cuisines: ['Hyderabadi', 'Biryani', 'Kebabs'],
+    deliveryTime: 45,
+    priceForTwo: 900,
+    distance: 5.2,
+    isPureVeg: false,
+    address: 'High Street, Bangalore',
+    description: 'Legendary Hyderabadi Biryani since 1953.',
+    offers: []
   },
   {
       id: 'res-12',

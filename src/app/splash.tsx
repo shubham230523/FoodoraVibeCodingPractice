@@ -1,16 +1,14 @@
 import React, { useEffect } from 'react';
-import { View, StyleSheet, Animated, Dimensions } from 'react-native';
-import { useRouter } from 'expo-router';
+import { View, StyleSheet, Animated, Text } from 'react-native';
+import { useRouter, Stack } from 'expo-router';
 import { theme } from '../theme/theme';
 import { Logo } from '../components/common/Logo';
 import { StatusBar } from 'expo-status-bar';
 
-const { height } = Dimensions.get('window');
-
 export default function SplashScreen() {
   const router = useRouter();
-  const fadeAnim = new Animated.Value(0);
-  const scaleAnim = new Animated.Value(0.8);
+  const fadeAnim = React.useRef(new Animated.Value(0)).current;
+  const scaleAnim = React.useRef(new Animated.Value(0.8)).current;
 
   useEffect(() => {
     Animated.parallel([
@@ -35,6 +33,7 @@ export default function SplashScreen() {
 
   return (
     <View style={styles.container}>
+      <Stack.Screen options={{ title: 'Foodora', headerShown: false }} />
       <StatusBar style="light" translucent backgroundColor="transparent" />
       <Animated.View style={{
         opacity: fadeAnim,
@@ -43,9 +42,9 @@ export default function SplashScreen() {
       }}>
         <Logo size="xl" textColor={theme.colors.white} style={styles.logo} />
         <View style={styles.taglineContainer}>
-          <Animated.Text style={styles.tagline}>
+          <Text style={styles.tagline}>
             Good food. Delivered.
-          </Animated.Text>
+          </Text>
         </View>
       </Animated.View>
     </View>

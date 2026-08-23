@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { View, StyleSheet, Animated, Text } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, Stack } from 'expo-router';
 import { theme } from '../theme/theme';
 import { Logo } from '../components/common/Logo';
 import { StatusBar } from 'expo-status-bar';
@@ -33,6 +33,7 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
+      <Stack.Screen options={{ title: 'Foodora', headerShown: false }} />
       <StatusBar style="light" translucent backgroundColor="transparent" />
       <Animated.View style={{
         opacity: fadeAnim,

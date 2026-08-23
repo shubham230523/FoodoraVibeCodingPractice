@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Dimensions
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -17,12 +16,12 @@ import { useCartStore } from '../../store/cartStore';
 import { Button } from '../../components/common/Button';
 import { SelectedCustomization } from '../../types/cart';
 import { ImageWithPlaceholder } from '../../components/common/ImageWithPlaceholder';
-
-const { height } = Dimensions.get('window');
+import { useResponsive } from '../../hooks/useResponsive';
 
 export default function FoodDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const { isLargeScreen } = useResponsive();
 
   const foodItem = allFoodItems.find(item => item.id === id);
   const restaurant = restaurants.find(r => r.id === foodItem?.restaurantId);
@@ -40,9 +39,7 @@ export default function FoodDetailScreen() {
     if (isSelected) {
       setSelectedCustomizations(prev => prev.filter(sc => sc.optionId !== option.id));
     } else {
-      // Handle radio button behavior for single choice
       if (cust.isRequired && cust.options.length > 0) {
-        // Find if any other option from this customization is selected
         const otherSelected = selectedCustomizations.filter(sc => sc.customizationId !== cust.id);
         setSelectedCustomizations([...otherSelected, {
           customizationId: cust.id,
@@ -69,7 +66,6 @@ export default function FoodDetailScreen() {
   };
 
   const handleAddToCart = () => {
-    // Basic validation for required customizations
     const missingRequired = foodItem.customizations?.filter(c =>
       c.isRequired && !selectedCustomizations.some(sc => sc.customizationId === c.id)
     );
@@ -96,85 +92,104 @@ export default function FoodDetailScreen() {
     router.back();
   };
 
+  const renderInfo = () => (
+    <View style={styles.infoSection}>
+      <View style={styles.vegIndicator}>
+        <View style={[styles.vegDot, { backgroundColor: foodItem.isVeg ? '#00A86B' : '#C82333' }]} />
+      </View>
+      <Text style={styles.name}>{foodItem.name}</Text>
+      <Text style={styles.description}>{foodItem.description}</Text>
+      <Text style={styles.basePrice}>₹{foodItem.price}</Text>
+    </View>
+  );
+
+  const renderCustomizations = () => (
+    <>
+      {foodItem.customizations?.map(cust => (
+        <View key={cust.id} style={styles.customSection}>
+          <View style={styles.customHeader}>
+            <View>
+              <Text style={styles.customTitle}>{cust.title}</Text>
+              <Text style={styles.customSubtitle}>
+                {cust.isRequired ? 'Required • Select 1' : 'Optional'}
+              </Text>
+            </View>
+          </View>
+
+          {cust.options.map(option => {
+            const isSelected = selectedCustomizations.some(sc => sc.optionId === option.id);
+            return (
+              <TouchableOpacity
+                key={option.id}
+                style={styles.optionRow}
+                onPress={() => handleToggleOption(cust, option)}
+              >
+                <View style={styles.optionLeft}>
+                  <View style={[styles.radio, isSelected && styles.radioSelected]}>
+                    {isSelected && <View style={styles.radioInner} />}
+                  </View>
+                  <Text style={styles.optionName}>{option.name}</Text>
+                </View>
+                <Text style={styles.optionPrice}>
+                  {option.price > 0 ? `+₹${option.price}` : ''}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      ))}
+
+      <View style={styles.quantitySection}>
+        <Text style={styles.quantityTitle}>Quantity</Text>
+        <View style={styles.quantityControls}>
+          <TouchableOpacity
+            onPress={() => setQuantity(Math.max(1, quantity - 1))}
+            style={styles.qtyBtn}
+          >
+            <Minus size={20} color={theme.colors.primary} />
+          </TouchableOpacity>
+          <Text style={styles.qtyText}>{quantity}</Text>
+          <TouchableOpacity
+            onPress={() => setQuantity(quantity + 1)}
+            style={styles.qtyBtn}
+          >
+            <Plus size={20} color={theme.colors.primary} />
+          </TouchableOpacity>
+        </View>
+      </View>
+    </>
+  );
+
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.imageContainer}>
-          <ImageWithPlaceholder source={{ uri: foodItem.image }} style={styles.image} />
-          <TouchableOpacity onPress={() => router.back()} style={styles.closeBtn}>
-            <X size={24} color={theme.colors.white} />
+      <View style={styles.responsiveWrapper}>
+        <View style={styles.modalHeader}>
+           <Text style={styles.modalTitle}>Food Item</Text>
+           <TouchableOpacity onPress={() => router.back()} style={styles.closeBtnHeader}>
+            <X size={24} color={theme.colors.text} />
           </TouchableOpacity>
         </View>
 
-        <View style={styles.infoSection}>
-          <View style={styles.vegIndicator}>
-            <View style={[styles.vegDot, { backgroundColor: foodItem.isVeg ? '#00A86B' : '#C82333' }]} />
-          </View>
-          <Text style={styles.name}>{foodItem.name}</Text>
-          <Text style={styles.description}>{foodItem.description}</Text>
-          <Text style={styles.basePrice}>₹{foodItem.price}</Text>
-        </View>
-
-        {foodItem.customizations?.map(cust => (
-          <View key={cust.id} style={styles.customSection}>
-            <View style={styles.customHeader}>
-              <View>
-                <Text style={styles.customTitle}>{cust.title}</Text>
-                <Text style={styles.customSubtitle}>
-                  {cust.isRequired ? 'Required • Select 1' : 'Optional'}
-                </Text>
-              </View>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <View style={isLargeScreen ? styles.desktopLayout : null}>
+            <View style={isLargeScreen ? styles.imageCol : styles.imageContainer}>
+              <ImageWithPlaceholder source={{ uri: foodItem.image }} style={styles.image} />
             </View>
 
-            {cust.options.map(option => {
-              const isSelected = selectedCustomizations.some(sc => sc.optionId === option.id);
-              return (
-                <TouchableOpacity
-                  key={option.id}
-                  style={styles.optionRow}
-                  onPress={() => handleToggleOption(cust, option)}
-                >
-                  <View style={styles.optionLeft}>
-                    <View style={[styles.radio, isSelected && styles.radioSelected]}>
-                      {isSelected && <View style={styles.radioInner} />}
-                    </View>
-                    <Text style={styles.optionName}>{option.name}</Text>
-                  </View>
-                  <Text style={styles.optionPrice}>
-                    {option.price > 0 ? `+₹${option.price}` : ''}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
+            <View style={isLargeScreen ? styles.detailsCol : null}>
+              {renderInfo()}
+              {renderCustomizations()}
+            </View>
           </View>
-        ))}
+        </ScrollView>
 
-        <View style={styles.quantitySection}>
-          <Text style={styles.quantityTitle}>Quantity</Text>
-          <View style={styles.quantityControls}>
-            <TouchableOpacity
-              onPress={() => setQuantity(Math.max(1, quantity - 1))}
-              style={styles.qtyBtn}
-            >
-              <Minus size={20} color={theme.colors.primary} />
-            </TouchableOpacity>
-            <Text style={styles.qtyText}>{quantity}</Text>
-            <TouchableOpacity
-              onPress={() => setQuantity(quantity + 1)}
-              style={styles.qtyBtn}
-            >
-              <Plus size={20} color={theme.colors.primary} />
-            </TouchableOpacity>
-          </View>
+        <View style={[styles.footer, isLargeScreen && styles.largeFooter]}>
+          <Button
+            title={`Add item • ₹${calculateTotalPrice()}`}
+            onPress={handleAddToCart}
+            style={styles.addBtn}
+          />
         </View>
-      </ScrollView>
-
-      <View style={styles.footer}>
-        <Button
-          title={`Add item • ₹${calculateTotalPrice()}`}
-          onPress={handleAddToCart}
-          style={styles.addBtn}
-        />
       </View>
     </SafeAreaView>
   );
@@ -185,26 +200,58 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.background,
   },
+  responsiveWrapper: {
+    flex: 1,
+    maxWidth: 900,
+    width: '100%',
+    alignSelf: 'center',
+    backgroundColor: theme.colors.background,
+    marginVertical: 0,
+    borderWidth: 0,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: theme.spacing.lg,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+  },
+  modalTitle: {
+    fontSize: theme.typography.fontSize.md,
+    fontWeight: theme.typography.fontWeight.bold,
+  },
+  closeBtnHeader: {
+    padding: 4,
+  },
   scrollContent: {
-    paddingBottom: 100,
+    paddingBottom: 120,
+  },
+  desktopLayout: {
+    flexDirection: 'row',
+    padding: theme.spacing.xl,
+    gap: theme.spacing.xxl,
+  },
+  imageCol: {
+    flex: 1,
+    height: 450,
+    borderRadius: theme.radius.lg,
+    overflow: 'hidden',
+    backgroundColor: theme.colors.surface,
+  },
+  detailsCol: {
+    flex: 1,
+    paddingTop: 0,
   },
   imageContainer: {
     width: '100%',
-    height: 250,
+    height: 300,
     position: 'relative',
   },
   image: {
     width: '100%',
     height: '100%',
     resizeMode: 'cover',
-  },
-  closeBtn: {
-    position: 'absolute',
-    top: 20,
-    right: 20,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    borderRadius: 20,
-    padding: 6,
   },
   infoSection: {
     padding: theme.spacing.lg,
@@ -234,9 +281,10 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.fontSize.sm,
     color: theme.colors.textSecondary,
     marginTop: 8,
+    lineHeight: 20,
   },
   basePrice: {
-    fontSize: theme.typography.fontSize.lg,
+    fontSize: 20,
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.text,
     marginTop: 12,
@@ -329,6 +377,11 @@ const styles = StyleSheet.create({
     padding: theme.spacing.lg,
     borderTopWidth: 1,
     borderTopColor: theme.colors.border,
+    zIndex: 10,
+  },
+  largeFooter: {
+    maxWidth: 900,
+    alignSelf: 'center',
   },
   addBtn: {
     width: '100%',

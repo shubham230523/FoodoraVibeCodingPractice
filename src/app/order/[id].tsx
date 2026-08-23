@@ -12,11 +12,13 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { theme } from '../../theme/theme';
 import { useOrderStore } from '../../store/orderStore';
 import { OrderStatus } from '../../types/order';
-import { ChevronLeft, Phone, MessageSquare, MapPin, CheckCircle2, Circle } from 'lucide-react-native';
+import { ChevronLeft, Phone, MessageSquare, MapPin, CheckCircle2, Circle, Package, ReceiptText } from 'lucide-react-native';
+import { useResponsive } from '../../hooks/useResponsive';
 
 export default function OrderTrackingScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const { isLargeScreen } = useResponsive();
   const { getOrder, updateOrderStatus } = useOrderStore();
 
   const order = getOrder(id!);
@@ -52,6 +54,54 @@ export default function OrderTrackingScreen() {
 
   if (!order) return null;
 
+  const renderTimeline = () => (
+    <View style={styles.trackingSection}>
+      <Text style={styles.sectionTitle}>Track Order</Text>
+      <View style={styles.timeline}>
+        {steps.map((step, index) => (
+          <View key={step.status} style={styles.timelineItem}>
+            <View style={styles.timelineLeft}>
+              {index <= activeStep ? (
+                <CheckCircle2 size={24} color={theme.colors.success} fill={theme.colors.white} />
+              ) : (
+                <Circle size={24} color={theme.colors.textLight} />
+              )}
+              {index < steps.length - 1 && (
+                <View style={[styles.timelineLine, index < activeStep && styles.lineActive]} />
+              )}
+            </View>
+            <View style={styles.timelineRight}>
+              <Text style={[styles.stepTitle, index <= activeStep && styles.activeText]}>
+                {step.title}
+              </Text>
+              {index <= activeStep && <Text style={styles.stepTime}>{step.time}</Text>}
+            </View>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+
+  const renderOrderItems = () => (
+    <View style={styles.itemsCard}>
+      <View style={styles.cardHeader}>
+        <Package size={20} color={theme.colors.textSecondary} />
+        <Text style={styles.cardTitle}>Order Items</Text>
+      </View>
+      {order.items.map((item, idx) => (
+        <View key={item.id} style={styles.itemRow}>
+          <Text style={styles.itemQty}>{item.quantity} x</Text>
+          <Text style={styles.itemName} numberOfLines={1}>{item.name}</Text>
+          <Text style={styles.itemPrice}>₹{item.price * item.quantity}</Text>
+        </View>
+      ))}
+      <View style={styles.totalRow}>
+        <Text style={styles.totalLabel}>Total Paid</Text>
+        <Text style={styles.totalValue}>₹{order.total}</Text>
+      </View>
+    </View>
+  );
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -63,52 +113,38 @@ export default function OrderTrackingScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.restaurantCard}>
-          <Image source={{ uri: order.restaurantImage }} style={styles.resImage} />
-          <View style={styles.resInfo}>
-            <Text style={styles.resName}>{order.restaurantName}</Text>
-            <Text style={styles.orderSummary}>{order.items.length} items • ₹{order.total}</Text>
+        <View style={styles.responsiveWrapper}>
+          <View style={styles.restaurantCard}>
+            <Image source={{ uri: order.restaurantImage }} style={styles.resImage} />
+            <View style={styles.resInfo}>
+              <Text style={styles.resName}>{order.restaurantName}</Text>
+              <Text style={styles.orderSummary}>{order.items.length} items • ₹{order.total}</Text>
+            </View>
+            <View style={styles.actionIcons}>
+              <TouchableOpacity style={styles.iconBtn}><Phone size={20} color={theme.colors.primary} /></TouchableOpacity>
+              <TouchableOpacity style={styles.iconBtn}><MessageSquare size={20} color={theme.colors.primary} /></TouchableOpacity>
+            </View>
           </View>
-          <View style={styles.actionIcons}>
-            <TouchableOpacity style={styles.iconBtn}><Phone size={20} color={theme.colors.primary} /></TouchableOpacity>
-            <TouchableOpacity style={styles.iconBtn}><MessageSquare size={20} color={theme.colors.primary} /></TouchableOpacity>
-          </View>
-        </View>
 
-        <View style={styles.trackingSection}>
-          <Text style={styles.sectionTitle}>Track Order</Text>
-          <View style={styles.timeline}>
-            {steps.map((step, index) => (
-              <View key={step.status} style={styles.timelineItem}>
-                <View style={styles.timelineLeft}>
-                  {index <= activeStep ? (
-                    <CheckCircle2 size={24} color={theme.colors.success} fill={theme.colors.white} />
-                  ) : (
-                    <Circle size={24} color={theme.colors.textLight} />
-                  )}
-                  {index < steps.length - 1 && (
-                    <View style={[styles.timelineLine, index < activeStep && styles.lineActive]} />
-                  )}
+          <View style={isLargeScreen ? styles.twoColumnLayout : null}>
+            <View style={isLargeScreen ? styles.mainCol : null}>
+              {renderTimeline()}
+            </View>
+
+            <View style={isLargeScreen ? styles.sideCol : null}>
+              {renderOrderItems()}
+
+              <View style={styles.deliveryCard}>
+                <View style={styles.deliveryHeader}>
+                  <MapPin size={20} color={theme.colors.textSecondary} />
+                  <Text style={styles.deliveryTitle}>Delivery Address</Text>
                 </View>
-                <View style={styles.timelineRight}>
-                  <Text style={[styles.stepTitle, index <= activeStep && styles.activeText]}>
-                    {step.title}
-                  </Text>
-                  {index <= activeStep && <Text style={styles.stepTime}>{step.time}</Text>}
-                </View>
+                <Text style={styles.addressText}>
+                  A-402, Sunshine Apartments, HSR Layout, Near HSR Police Station, Bangalore
+                </Text>
               </View>
-            ))}
+            </View>
           </View>
-        </View>
-
-        <View style={styles.deliveryCard}>
-          <View style={styles.deliveryHeader}>
-            <MapPin size={20} color={theme.colors.textSecondary} />
-            <Text style={styles.deliveryTitle}>Delivery Address</Text>
-          </View>
-          <Text style={styles.addressText}>
-            A-402, Sunshine Apartments, HSR Layout, Near HSR Police Station, Bangalore
-          </Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -119,6 +155,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.surface,
+  },
+  responsiveWrapper: {
+    maxWidth: 1000,
+    width: '100%',
+    alignSelf: 'center',
   },
   header: {
     flexDirection: 'row',
@@ -168,6 +209,17 @@ const styles = StyleSheet.create({
     padding: theme.spacing.xs,
     marginLeft: theme.spacing.xs,
   },
+  twoColumnLayout: {
+    flexDirection: 'row',
+    gap: theme.spacing.lg,
+  },
+  mainCol: {
+    flex: 1.5,
+  },
+  sideCol: {
+    flex: 1,
+    gap: theme.spacing.lg,
+  },
   trackingSection: {
     backgroundColor: theme.colors.white,
     padding: theme.spacing.lg,
@@ -216,6 +268,62 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: theme.colors.textSecondary,
     marginTop: 2,
+  },
+  itemsCard: {
+    backgroundColor: theme.colors.white,
+    padding: theme.spacing.lg,
+    borderRadius: theme.radius.md,
+    ...theme.shadows.md,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: theme.spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+    paddingBottom: theme.spacing.sm,
+  },
+  cardTitle: {
+    marginLeft: theme.spacing.sm,
+    fontSize: theme.typography.fontSize.sm,
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.textSecondary,
+  },
+  itemRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: theme.spacing.xs,
+  },
+  itemQty: {
+    width: 30,
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+  },
+  itemName: {
+    flex: 1,
+    fontSize: 12,
+    color: theme.colors.text,
+  },
+  itemPrice: {
+    fontSize: 12,
+    color: theme.colors.text,
+  },
+  totalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: theme.spacing.md,
+    paddingTop: theme.spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
+  },
+  totalLabel: {
+    fontSize: 14,
+    fontWeight: theme.typography.fontWeight.bold,
+  },
+  totalValue: {
+    fontSize: 14,
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.primary,
   },
   deliveryCard: {
     backgroundColor: theme.colors.white,

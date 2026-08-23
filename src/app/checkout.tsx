@@ -13,14 +13,16 @@ import { theme } from '../theme/theme';
 import { useCartStore } from '../store/cartStore';
 import { useUserStore } from '../store/userStore';
 import { useOrderStore } from '../store/orderStore';
-import { CreditCard, Wallet, Smartphone, Landmark, Check } from 'lucide-react-native';
+import { CreditCard, Wallet, Smartphone, Check } from 'lucide-react-native';
 import { Button } from '../components/common/Button';
 import { OrderStatus } from '../types/order';
+import { useResponsive } from '../hooks/useResponsive';
 
 type PaymentMethod = 'COD' | 'UPI' | 'CARD';
 
 export default function CheckoutScreen() {
   const router = useRouter();
+  const { isLargeScreen } = useResponsive();
   const { items, restaurantId, restaurantName, restaurantImage, clearCart, getTotals } = useCartStore();
   const { getSelectedAddress } = useUserStore();
   const { addOrder } = useOrderStore();
@@ -68,6 +70,7 @@ export default function CheckoutScreen() {
 
   const renderPaymentOption = (id: PaymentMethod, title: string, subtitle: string, icon: React.ReactNode) => (
     <TouchableOpacity
+      key={id}
       style={[styles.paymentOption, selectedMethod === id && styles.selectedOption]}
       onPress={() => setSelectedMethod(id)}
     >
@@ -86,55 +89,57 @@ export default function CheckoutScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Select Payment Method</Text>
-          {renderPaymentOption(
-            'UPI',
-            'Google Pay / PhonePe / BHIM UPI',
-            'Pay via any UPI app',
-            <Smartphone color={theme.colors.text} />
-          )}
-          {renderPaymentOption(
-            'CARD',
-            'Credit / Debit Cards',
-            'Visa, Mastercard, RuPay',
-            <CreditCard color={theme.colors.text} />
-          )}
-          {renderPaymentOption(
-            'COD',
-            'Cash on Delivery',
-            'Pay after you receive your order',
-            <Wallet color={theme.colors.text} />
-          )}
-        </View>
-
-        <View style={styles.summarySection}>
-          <Text style={styles.sectionTitle}>Order Summary</Text>
-          <View style={styles.summaryCard}>
-            <Text style={styles.summaryResName}>{restaurantName}</Text>
-            <Text style={styles.summaryItems}>{items.length} item(s) • To Pay: ₹{totals.total}</Text>
+      <View style={styles.responsiveWrapper}>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Select Payment Method</Text>
+            {renderPaymentOption(
+              'UPI',
+              'Google Pay / PhonePe / BHIM UPI',
+              'Pay via any UPI app',
+              <Smartphone color={theme.colors.text} />
+            )}
+            {renderPaymentOption(
+              'CARD',
+              'Credit / Debit Cards',
+              'Visa, Mastercard, RuPay',
+              <CreditCard color={theme.colors.text} />
+            )}
+            {renderPaymentOption(
+              'COD',
+              'Cash on Delivery',
+              'Pay after you receive your order',
+              <Wallet color={theme.colors.text} />
+            )}
           </View>
-        </View>
 
-        <View style={styles.safetyInfo}>
-          <Text style={styles.safetyText}>
-            Your payment is secure. We use industry-standard encryption to protect your data.
-          </Text>
-        </View>
-      </ScrollView>
+          <View style={styles.summarySection}>
+            <Text style={styles.sectionTitle}>Order Summary</Text>
+            <View style={styles.summaryCard}>
+              <Text style={styles.summaryResName}>{restaurantName}</Text>
+              <Text style={styles.summaryItems}>{items.length} item(s) • To Pay: ₹{totals.total}</Text>
+            </View>
+          </View>
 
-      <View style={styles.footer}>
-        <View style={styles.priceContainer}>
-          <Text style={styles.finalTotal}>₹{totals.total}</Text>
-          <Text style={styles.viewDetailed}>VIEW DETAILED BILL</Text>
+          <View style={styles.safetyInfo}>
+            <Text style={styles.safetyText}>
+              Your payment is secure. We use industry-standard encryption to protect your data.
+            </Text>
+          </View>
+        </ScrollView>
+
+        <View style={[styles.footer, isLargeScreen && styles.largeFooter]}>
+          <View style={styles.priceContainer}>
+            <Text style={styles.finalTotal}>₹{totals.total}</Text>
+            <Text style={styles.viewDetailed}>VIEW DETAILED BILL</Text>
+          </View>
+          <Button
+            title={isProcessing ? "Processing..." : "Place Order"}
+            onPress={handlePlaceOrder}
+            loading={isProcessing}
+            style={styles.placeOrderBtn}
+          />
         </View>
-        <Button
-          title={isProcessing ? "Processing..." : "Place Order"}
-          onPress={handlePlaceOrder}
-          loading={isProcessing}
-          style={styles.placeOrderBtn}
-        />
       </View>
     </SafeAreaView>
   );
@@ -145,8 +150,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.surface,
   },
+  responsiveWrapper: {
+    flex: 1,
+    maxWidth: 800,
+    alignSelf: 'center',
+    width: '100%',
+    backgroundColor: theme.colors.background,
+  },
   scrollContent: {
     padding: theme.spacing.lg,
+    paddingBottom: 150,
   },
   section: {
     marginBottom: theme.spacing.xl,
@@ -243,6 +256,10 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: theme.colors.border,
     ...theme.shadows.lg,
+  },
+  largeFooter: {
+    maxWidth: 800,
+    alignSelf: 'center',
   },
   priceContainer: {
     flex: 1,

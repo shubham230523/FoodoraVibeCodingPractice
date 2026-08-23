@@ -4,20 +4,22 @@ import {
   Text,
   StyleSheet,
   TextInput,
-  FlatList,
   TouchableOpacity,
   ScrollView,
-  Image
+  Image,
+  Dimensions
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../theme/theme';
-import { Search, X, ChevronLeft, Clock, TrendingUp } from 'lucide-react-native';
+import { Search, X, Clock, TrendingUp } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useSearch } from '../../features/search/hooks/useSearch';
 import { RestaurantCard } from '../../components/restaurant/RestaurantCard';
+import { useResponsive } from '../../hooks/useResponsive';
 
 export default function SearchScreen() {
   const router = useRouter();
+  const { isLargeScreen, width } = useResponsive();
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
 
@@ -32,6 +34,8 @@ export default function SearchScreen() {
 
   const recentSearches = ['Pizza', 'Burger', 'Biryani', 'Starbucks'];
   const trendingSearches = ['Healthy Salads', 'Ice Cream', 'Rolls', 'Paneer Tikka'];
+
+  const numColumns = isLargeScreen ? (width > 1400 ? 3 : 2) : 1;
 
   const renderRecentSearch = (item: string) => (
     <TouchableOpacity
@@ -55,86 +59,95 @@ export default function SearchScreen() {
     </TouchableOpacity>
   );
 
-  const renderResult = ({ item }: { item: any }) => {
+  const renderResultItem = (item: any) => {
     // Check if it's a restaurant or a dish (mock data search returns both)
     if ('cuisines' in item) {
       return (
-        <RestaurantCard
-          restaurant={item}
-          onPress={() => router.push(`/restaurant/${item.id}`)}
-        />
+        <View
+          key={item.id}
+          style={isLargeScreen ? [styles.gridItem, { width: `${100 / numColumns}%` }] : styles.mobileItem}
+        >
+          <RestaurantCard
+            restaurant={item}
+            onPress={() => router.push(`/restaurant/${item.id}`)}
+          />
+        </View>
       );
     }
 
     // Dish result
     return (
-      <TouchableOpacity
-        style={styles.dishResult}
-        onPress={() => router.push(`/restaurant/${item.restaurantId}`)}
+      <View
+        key={item.id}
+        style={isLargeScreen ? [styles.gridItem, { width: `${100 / numColumns}%` }] : styles.mobileItem}
       >
-        <Image source={{ uri: item.image }} style={styles.dishImage} />
-        <View style={styles.dishInfo}>
-          <Text style={styles.dishName}>{item.name}</Text>
-          <Text style={styles.dishPrice}>₹{item.price}</Text>
-          <Text style={styles.dishResName}>from Best Restaurant</Text>
-        </View>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.dishResult}
+          onPress={() => router.push(`/restaurant/${item.restaurantId}`)}
+        >
+          <Image source={{ uri: item.image }} style={styles.dishImage} />
+          <View style={styles.dishInfo}>
+            <Text style={styles.dishName}>{item.name}</Text>
+            <Text style={styles.dishPrice}>₹{item.price}</Text>
+            <Text style={styles.dishResName}>from Best Restaurant</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
     );
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.searchHeader}>
-        <View style={styles.searchContainer}>
-          <Search size={20} color={theme.colors.primary} />
-          <TextInput
-            style={styles.input}
-            placeholder="Search for restaurants, dishes..."
-            value={query}
-            onChangeText={setQuery}
-            autoFocus
-          />
-          {query.length > 0 && (
-            <TouchableOpacity onPress={() => setQuery('')}>
-              <X size={20} color={theme.colors.textSecondary} />
-            </TouchableOpacity>
-          )}
-        </View>
-      </View>
-
-      {debouncedQuery.length < 2 ? (
-        <ScrollView style={styles.suggestions}>
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Recent Searches</Text>
-            {recentSearches.map(renderRecentSearch)}
-          </View>
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Trending Searches</Text>
-            <View style={styles.trendingGrid}>
-              {trendingSearches.map(renderTrendingSearch)}
-            </View>
-          </View>
-        </ScrollView>
-      ) : (
-        <View style={styles.resultsContainer}>
-          {isLoading ? (
-            <Text style={styles.statusText}>Searching...</Text>
-          ) : data && (data.restaurants.length > 0 || data.foodItems.length > 0) ? (
-            <FlatList
-              data={[...data.restaurants, ...data.foodItems]}
-              keyExtractor={(item) => item.id}
-              renderItem={renderResult}
-              contentContainerStyle={styles.listContent}
+      <View style={styles.responsiveWrapper}>
+        <View style={styles.searchHeader}>
+          <View style={styles.searchContainer}>
+            <Search size={20} color={theme.colors.primary} />
+            <TextInput
+              style={styles.input}
+              placeholder="Search for restaurants, dishes..."
+              value={query}
+              onChangeText={setQuery}
+              autoFocus
             />
-          ) : (
-            <View style={styles.emptyState}>
-              <Search size={64} color={theme.colors.textLight} />
-              <Text style={styles.emptyText}>No results found for "{debouncedQuery}"</Text>
-              <Text style={styles.emptySubText}>Try searching for something else</Text>
-            </View>
-          )}
+            {query.length > 0 && (
+              <TouchableOpacity onPress={() => setQuery('')}>
+                <X size={20} color={theme.colors.textSecondary} />
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
-      )}
+
+        {debouncedQuery.length < 2 ? (
+          <ScrollView style={styles.suggestions}>
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Recent Searches</Text>
+              {recentSearches.map(renderRecentSearch)}
+            </View>
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Trending Searches</Text>
+              <View style={styles.trendingGrid}>
+                {trendingSearches.map(renderTrendingSearch)}
+              </View>
+            </View>
+          </ScrollView>
+        ) : (
+          <ScrollView style={styles.resultsContainer} showsVerticalScrollIndicator={false}>
+            {isLoading ? (
+              <Text style={styles.statusText}>Searching...</Text>
+            ) : data && (data.restaurants.length > 0 || data.foodItems.length > 0) ? (
+              <View style={isLargeScreen ? styles.gridContainer : styles.listContent}>
+                {[...data.restaurants, ...data.foodItems].map(renderResultItem)}
+              </View>
+            ) : (
+              <View style={styles.emptyState}>
+                <Search size={64} color={theme.colors.textLight} />
+                <Text style={styles.emptyText}>No results found for "{debouncedQuery}"</Text>
+                <Text style={styles.emptySubText}>Try searching for something else</Text>
+              </View>
+            )}
+          </ScrollView>
+        )}
+      </View>
     </SafeAreaView>
   );
 }
@@ -143,6 +156,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
+  },
+  responsiveWrapper: {
+    flex: 1,
+    maxWidth: 1200,
+    alignSelf: 'center',
+    width: '100%',
   },
   searchHeader: {
     padding: theme.spacing.lg,
@@ -214,6 +233,19 @@ const styles = StyleSheet.create({
   listContent: {
     paddingTop: theme.spacing.lg,
   },
+  gridContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: theme.spacing.lg / 2,
+    paddingTop: theme.spacing.lg,
+  },
+  gridItem: {
+    paddingHorizontal: theme.spacing.lg / 2,
+    marginBottom: theme.spacing.md,
+  },
+  mobileItem: {
+    width: '100%',
+  },
   statusText: {
     textAlign: 'center',
     marginTop: theme.spacing.xl,
@@ -224,6 +256,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: theme.spacing.xxl,
+    marginTop: 50,
   },
   emptyText: {
     fontSize: theme.typography.fontSize.lg,

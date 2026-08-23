@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 import { theme } from '../../theme/theme';
 import { Restaurant } from '../../types/restaurant';
 import { Card } from '../common/Card';
@@ -11,18 +11,20 @@ import { ImageWithPlaceholder } from '../common/ImageWithPlaceholder';
 interface RestaurantCardProps {
   restaurant: Restaurant;
   onPress: () => void;
+  style?: ViewStyle;
 }
 
-export const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant, onPress }) => {
+export const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant, onPress, style }) => {
   const { toggleFavorite, isFavorite } = useFavoriteStore();
   const favorite = isFavorite(restaurant.id);
 
+  const imageSource = React.useMemo(() => ({ uri: restaurant.image }), [restaurant.image]);
   const bestOffer = restaurant.offers.length > 0 ? restaurant.offers[0] : null;
 
   return (
-    <Card style={styles.container} onPress={onPress}>
+    <Card style={[styles.container, style]} onPress={onPress}>
       <View style={styles.imageContainer}>
-        <ImageWithPlaceholder source={{ uri: restaurant.image }} style={styles.image} />
+        <ImageWithPlaceholder source={imageSource} style={styles.image} />
         <TouchableOpacity
           style={styles.favoriteButton}
           onPress={() => toggleFavorite(restaurant.id)}
@@ -73,7 +75,6 @@ export const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant, onPr
 const styles = StyleSheet.create({
   container: {
     marginBottom: theme.spacing.lg,
-    marginHorizontal: theme.spacing.lg,
   },
   imageContainer: {
     height: 180,

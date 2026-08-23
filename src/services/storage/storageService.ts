@@ -13,7 +13,11 @@ export const storageService = {
     try {
       const jsonValue = JSON.stringify(value);
       if (Platform.OS === 'web') {
-        localStorage.setItem(key, jsonValue);
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem(key, jsonValue);
+        } else {
+          memoryStorage[key] = jsonValue;
+        }
       } else {
         await SecureStore.setItemAsync(key, jsonValue);
       }
@@ -27,7 +31,9 @@ export const storageService = {
     try {
       let jsonValue: string | null = null;
       if (Platform.OS === 'web') {
-        jsonValue = localStorage.getItem(key);
+        if (typeof localStorage !== 'undefined') {
+          jsonValue = localStorage.getItem(key);
+        }
       } else {
         jsonValue = await SecureStore.getItemAsync(key);
       }
@@ -46,7 +52,9 @@ export const storageService = {
   removeItem: async (key: string): Promise<void> => {
     try {
       if (Platform.OS === 'web') {
-        localStorage.removeItem(key);
+        if (typeof localStorage !== 'undefined') {
+          localStorage.removeItem(key);
+        }
       } else {
         await SecureStore.deleteItemAsync(key);
       }
@@ -59,7 +67,7 @@ export const storageService = {
   clear: async (): Promise<void> => {
     // SecureStore doesn't have a clear all, so we'd need to track keys.
     // For this app, we'll just clear the memory and web storage.
-    if (Platform.OS === 'web') {
+    if (Platform.OS === 'web' && typeof localStorage !== 'undefined') {
       localStorage.clear();
     }
     Object.keys(memoryStorage).forEach(key => delete memoryStorage[key]);

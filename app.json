@@ -3,6 +3,7 @@
     "name": "Foodora",
     "slug": "foodora",
     "version": "1.0.0",
+    "baseUrl": "/FoodoraVibeCodingPractice",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "foodora",
@@ -41,7 +42,7 @@
     ],
     "experiments": {
       "typedRoutes": true,
-      "reactCompiler": true
+      "reactCompiler": false
     }
   }
 }

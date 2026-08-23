@@ -14,8 +14,25 @@ export const ImageWithPlaceholder: React.FC<ImageWithPlaceholderProps> = ({
   containerStyle,
   ...props
 }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [hasError, setHasError] = useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [hasError, setHasError] = React.useState(false);
+
+  // Reset loading state when source changes
+  const sourceKey = typeof source === 'object' && source !== null && 'uri' in source ? source.uri : JSON.stringify(source);
+
+  React.useEffect(() => {
+    setIsLoading(true);
+    setHasError(false);
+  }, [sourceKey]);
+
+  const handleLoadEnd = React.useCallback(() => {
+    setIsLoading(false);
+  }, []);
+
+  const handleError = React.useCallback(() => {
+    setIsLoading(false);
+    setHasError(true);
+  }, []);
 
   return (
     <View style={[styles.container, containerStyle, style]}>
@@ -23,12 +40,8 @@ export const ImageWithPlaceholder: React.FC<ImageWithPlaceholderProps> = ({
         <Image
           source={source}
           style={[StyleSheet.absoluteFill, style]}
-          onLoadStart={() => setIsLoading(true)}
-          onLoadEnd={() => setIsLoading(false)}
-          onError={() => {
-            setIsLoading(false);
-            setHasError(true);
-          }}
+          onLoadEnd={handleLoadEnd}
+          onError={handleError}
           {...props}
         />
       ) : (
@@ -43,7 +56,7 @@ export const ImageWithPlaceholder: React.FC<ImageWithPlaceholderProps> = ({
         </View>
       )}
 
-      {hasError && (
+      {!isLoading && hasError && (
         <View style={[styles.placeholder, style]}>
           <LucideImage size={24} color={theme.colors.textLight} />
         </View>

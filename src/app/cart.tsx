@@ -12,16 +12,17 @@ import { useRouter } from 'expo-router';
 import { theme } from '../theme/theme';
 import { useCartStore } from '../store/cartStore';
 import { useUserStore } from '../store/userStore';
-import { Minus, Plus, Trash2, ChevronRight, MapPin, Tag, CreditCard } from 'lucide-react-native';
+import { Minus, Plus, ChevronRight, MapPin, Tag } from 'lucide-react-native';
 import { Button } from '../components/common/Button';
+import { useResponsive } from '../hooks/useResponsive';
 
 export default function CartScreen() {
   const router = useRouter();
+  const { isLargeScreen } = useResponsive();
   const {
     items,
     restaurantName,
     updateQuantity,
-    removeItem,
     getTotals,
     appliedCoupon
   } = useCartStore();
@@ -30,11 +31,15 @@ export default function CartScreen() {
   const address = getSelectedAddress();
   const totals = getTotals();
 
+  const emptyCartImageSource = React.useMemo(() => ({
+    uri: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400'
+  }), []);
+
   if (items.length === 0) {
     return (
       <View style={styles.emptyContainer}>
         <Image
-          source={{ uri: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400' }}
+          source={emptyCartImageSource}
           style={styles.emptyImage}
         />
         <Text style={styles.emptyTitle}>Your cart is empty</Text>
@@ -50,112 +55,114 @@ export default function CartScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.restaurantHeader}>
-          <Text style={styles.restaurantName}>{restaurantName}</Text>
-          <TouchableOpacity onPress={() => router.back()}>
-            <Text style={styles.addMore}>ADD MORE</Text>
+      <View style={styles.responsiveWrapper}>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <View style={styles.restaurantHeader}>
+            <Text style={styles.restaurantName}>{restaurantName}</Text>
+            <TouchableOpacity onPress={() => router.back()}>
+              <Text style={styles.addMore}>ADD MORE</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.itemsSection}>
+            {items.map((item) => (
+              <View key={item.id} style={styles.cartItem}>
+                <View style={styles.itemInfo}>
+                  <Text style={styles.itemName}>{item.name}</Text>
+                  {item.customizations.length > 0 && (
+                    <Text style={styles.itemCustoms}>
+                      {item.customizations.map(c => c.optionName).join(', ')}
+                    </Text>
+                  )}
+                  <Text style={styles.itemPrice}>₹{item.price + item.customizations.reduce((s, c) => s + c.price, 0)}</Text>
+                </View>
+
+                <View style={styles.quantityControls}>
+                  <TouchableOpacity
+                    style={styles.qtyBtn}
+                    onPress={() => updateQuantity(item.id, item.quantity - 1)}
+                  >
+                    <Minus size={14} color={theme.colors.primary} />
+                  </TouchableOpacity>
+                  <Text style={styles.qtyText}>{item.quantity}</Text>
+                  <TouchableOpacity
+                    style={styles.qtyBtn}
+                    onPress={() => updateQuantity(item.id, item.quantity + 1)}
+                  >
+                    <Plus size={14} color={theme.colors.primary} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ))}
+          </View>
+
+          <TouchableOpacity style={styles.couponSection}>
+            <View style={styles.couponLeft}>
+              <Tag size={20} color={theme.colors.text} />
+              <Text style={styles.couponText}>
+                {appliedCoupon ? `Applied: ${appliedCoupon.code}` : 'Use Coupons'}
+              </Text>
+            </View>
+            <ChevronRight size={20} color={theme.colors.textSecondary} />
           </TouchableOpacity>
-        </View>
 
-        <View style={styles.itemsSection}>
-          {items.map((item) => (
-            <View key={item.id} style={styles.cartItem}>
-              <View style={styles.itemInfo}>
-                <Text style={styles.itemName}>{item.name}</Text>
-                {item.customizations.length > 0 && (
-                  <Text style={styles.itemCustoms}>
-                    {item.customizations.map(c => c.optionName).join(', ')}
-                  </Text>
-                )}
-                <Text style={styles.itemPrice}>₹{item.price + item.customizations.reduce((s, c) => s + c.price, 0)}</Text>
-              </View>
-
-              <View style={styles.quantityControls}>
-                <TouchableOpacity
-                  style={styles.qtyBtn}
-                  onPress={() => updateQuantity(item.id, item.quantity - 1)}
-                >
-                  <Minus size={14} color={theme.colors.primary} />
-                </TouchableOpacity>
-                <Text style={styles.qtyText}>{item.quantity}</Text>
-                <TouchableOpacity
-                  style={styles.qtyBtn}
-                  onPress={() => updateQuantity(item.id, item.quantity + 1)}
-                >
-                  <Plus size={14} color={theme.colors.primary} />
-                </TouchableOpacity>
-              </View>
-            </View>
-          ))}
-        </View>
-
-        <TouchableOpacity style={styles.couponSection}>
-          <View style={styles.couponLeft}>
-            <Tag size={20} color={theme.colors.text} />
-            <Text style={styles.couponText}>
-              {appliedCoupon ? `Applied: ${appliedCoupon.code}` : 'Use Coupons'}
-            </Text>
-          </View>
-          <ChevronRight size={20} color={theme.colors.textSecondary} />
-        </TouchableOpacity>
-
-        <View style={styles.billSection}>
-          <Text style={styles.billTitle}>Bill Details</Text>
-          <View style={styles.billRow}>
-            <Text style={styles.billLabel}>Item Total</Text>
-            <Text style={styles.billValue}>₹{totals.subtotal}</Text>
-          </View>
-          <View style={styles.billRow}>
-            <Text style={styles.billLabel}>Delivery Fee</Text>
-            <Text style={styles.billValue}>₹{totals.deliveryFee}</Text>
-          </View>
-          <View style={styles.billRow}>
-            <Text style={styles.billLabel}>Taxes and Charges</Text>
-            <Text style={styles.billValue}>₹{totals.tax}</Text>
-          </View>
-          {totals.discount > 0 && (
+          <View style={styles.billSection}>
+            <Text style={styles.billTitle}>Bill Details</Text>
             <View style={styles.billRow}>
-              <Text style={[styles.billLabel, { color: theme.colors.success }]}>Item Discount</Text>
-              <Text style={[styles.billValue, { color: theme.colors.success }]}>-₹{totals.discount}</Text>
+              <Text style={styles.billLabel}>Item Total</Text>
+              <Text style={styles.billValue}>₹{totals.subtotal}</Text>
             </View>
-          )}
-          <View style={[styles.billRow, styles.totalRow]}>
-            <Text style={styles.totalLabel}>To Pay</Text>
-            <Text style={styles.totalValue}>₹{totals.total}</Text>
+            <View style={styles.billRow}>
+              <Text style={styles.billLabel}>Delivery Fee</Text>
+              <Text style={styles.billValue}>₹{totals.deliveryFee}</Text>
+            </View>
+            <View style={styles.billRow}>
+              <Text style={styles.billLabel}>Taxes and Charges</Text>
+              <Text style={styles.billValue}>₹{totals.tax}</Text>
+            </View>
+            {totals.discount > 0 && (
+              <View style={styles.billRow}>
+                <Text style={[styles.billLabel, { color: theme.colors.success }]}>Item Discount</Text>
+                <Text style={[styles.billValue, { color: theme.colors.success }]}>-₹{totals.discount}</Text>
+              </View>
+            )}
+            <View style={[styles.billRow, styles.totalRow]}>
+              <Text style={styles.totalLabel}>To Pay</Text>
+              <Text style={styles.totalValue}>₹{totals.total}</Text>
+            </View>
           </View>
-        </View>
 
-        <View style={styles.policySection}>
-          <Text style={styles.policyTitle}>Cancellation Policy</Text>
-          <Text style={styles.policyText}>
-            Help us in reducing food waste by avoiding cancellations after placing your order.
-            A 100% cancellation fee will be applicable.
-          </Text>
-        </View>
-      </ScrollView>
-
-      <View style={styles.footer}>
-        <TouchableOpacity
-          style={styles.addressSection}
-          onPress={() => router.push('/address')}
-        >
-          <MapPin size={20} color={theme.colors.primary} />
-          <View style={styles.addressInfo}>
-            <Text style={styles.addressTitle}>Deliver to {address?.type || 'Select Address'}</Text>
-            <Text style={styles.addressDetail} numberOfLines={1}>
-              {address ? `${address.flatNumber}, ${address.area}` : 'Click to add delivery address'}
+          <View style={styles.policySection}>
+            <Text style={styles.policyTitle}>Cancellation Policy</Text>
+            <Text style={styles.policyText}>
+              Help us in reducing food waste by avoiding cancellations after placing your order.
+              A 100% cancellation fee will be applicable.
             </Text>
           </View>
-          <Text style={styles.changeText}>CHANGE</Text>
-        </TouchableOpacity>
+        </ScrollView>
 
-        <Button
-          title="Proceed to Pay"
-          onPress={() => router.push('/checkout')}
-          style={styles.payBtn}
-          disabled={!address}
-        />
+        <View style={[styles.footer, isLargeScreen && styles.largeFooter]}>
+          <TouchableOpacity
+            style={styles.addressSection}
+            onPress={() => router.push('/address')}
+          >
+            <MapPin size={20} color={theme.colors.primary} />
+            <View style={styles.addressInfo}>
+              <Text style={styles.addressTitle}>Deliver to {address?.type || 'Select Address'}</Text>
+              <Text style={styles.addressDetail} numberOfLines={1}>
+                {address ? `${address.flatNumber}, ${address.area}` : 'Click to add delivery address'}
+              </Text>
+            </View>
+            <Text style={styles.changeText}>CHANGE</Text>
+          </TouchableOpacity>
+
+          <Button
+            title="Proceed to Pay"
+            onPress={() => router.push('/checkout')}
+            style={styles.payBtn}
+            disabled={!address}
+          />
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -166,8 +173,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.surface,
   },
+  responsiveWrapper: {
+    flex: 1,
+    maxWidth: 800,
+    alignSelf: 'center',
+    width: '100%',
+    backgroundColor: theme.colors.background,
+  },
   scrollContent: {
-    paddingBottom: 150,
+    paddingBottom: 200,
   },
   emptyContainer: {
     flex: 1,
@@ -334,6 +348,10 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.white,
     padding: theme.spacing.lg,
     ...theme.shadows.lg,
+  },
+  largeFooter: {
+    maxWidth: 800,
+    alignSelf: 'center',
   },
   addressSection: {
     flexDirection: 'row',

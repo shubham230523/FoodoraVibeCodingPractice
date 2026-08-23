@@ -10,10 +10,12 @@ interface CategoryItemProps {
 }
 
 export const CategoryItem: React.FC<CategoryItemProps> = ({ name, image, onPress }) => {
+  const imageSource = React.useMemo(() => ({ uri: image }), [image]);
+
   return (
     <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.7}>
       <View style={styles.imageContainer}>
-        <ImageWithPlaceholder source={{ uri: image }} style={styles.image} />
+        <ImageWithPlaceholder source={imageSource} style={styles.image} />
       </View>
       <Text style={styles.text} numberOfLines={1}>{name}</Text>
     </TouchableOpacity>

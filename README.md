@@ -1,5 +1,7 @@
 # Foodora - Good Food. Delivered. 🍔🚀
 
+**[🌐 View Live Demo](https://shubham230523.github.io/FoodoraVibeCodingPractice/)**
+
 Foodora is a premium, production-quality food delivery application built with **React Native** and **Expo**. Designed with a focus on seamless user experience, performance, and a modern design system, Foodora offers a complete journey from restaurant discovery to real-time order tracking.
 
 ---

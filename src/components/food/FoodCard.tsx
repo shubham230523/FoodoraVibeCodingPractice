@@ -15,6 +15,7 @@ interface FoodCardProps {
 export const FoodCard: React.FC<FoodCardProps> = ({ item, restaurantInfo, onPress }) => {
   const { items, addItem, updateQuantity } = useCartStore();
 
+  const imageSource = React.useMemo(() => ({ uri: item.image }), [item.image]);
   const cartItem = items.find(i => i.foodId === item.id);
   const quantity = cartItem?.quantity || 0;
 
@@ -67,7 +68,7 @@ export const FoodCard: React.FC<FoodCardProps> = ({ item, restaurantInfo, onPres
       </View>
 
       <View style={styles.imageWrapper}>
-        <ImageWithPlaceholder source={{ uri: item.image }} style={styles.image} />
+        <ImageWithPlaceholder source={imageSource} style={styles.image} />
         <View style={styles.actionContainer}>
           {quantity > 0 && !item.customizations?.length ? (
             <View style={styles.quantitySelector}>

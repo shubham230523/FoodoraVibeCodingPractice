@@ -19,12 +19,20 @@ import { useRouter } from 'expo-router';
 import { useUserStore } from '../../store/userStore';
 import { Logo } from '../../components/common/Logo';
 import { ImageWithPlaceholder } from '../../components/common/ImageWithPlaceholder';
+import { useResponsive } from '../../hooks/useResponsive';
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { isLargeScreen, width } = useResponsive();
   const { data: restaurants, isLoading } = useRestaurants();
   const { getSelectedAddress } = useUserStore();
   const currentAddress = getSelectedAddress();
+
+  const numColumns = isLargeScreen ? (width > 1400 ? 3 : 2) : 1;
+
+  const bannerSource = React.useMemo(() => ({
+    uri: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800'
+  }), []);
 
   const renderHeader = () => (
     <View style={styles.header}>
@@ -70,48 +78,68 @@ export default function HomeScreen() {
     </View>
   );
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles.topBar}>
-          <Logo size="md" />
-          <TouchableOpacity style={styles.notificationButton}>
-            <Bell size={24} color={theme.colors.text} />
-          </TouchableOpacity>
-        </View>
-        {renderHeader()}
-        {renderSearchBar()}
+  const renderRestaurantList = () => {
+    if (isLoading) return <Text style={styles.loadingText}>Loading deliciousness...</Text>;
 
-        {/* Promotional Banner */}
-        <View style={styles.bannerContainer}>
-          <ImageWithPlaceholder
-            source={{ uri: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800' }}
-            style={styles.bannerImage}
-          />
-          <View style={styles.bannerOverlay}>
-            <Text style={styles.bannerTitle}>50% OFF</Text>
-            <Text style={styles.bannerSubtitle}>On your first order</Text>
-            <TouchableOpacity style={styles.bannerButton}>
-              <Text style={styles.bannerButtonText}>Order Now</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {renderCategories()}
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Recommended Restaurants</Text>
-          {isLoading ? (
-            <Text style={styles.loadingText}>Loading deliciousness...</Text>
-          ) : (
-            restaurants?.map((restaurant) => (
+    if (isLargeScreen) {
+      return (
+        <View style={styles.gridContainer}>
+          {restaurants?.map((restaurant) => (
+            <View key={restaurant.id} style={[styles.gridItem, { width: `${100 / numColumns}%` }]}>
               <RestaurantCard
-                key={restaurant.id}
                 restaurant={restaurant}
                 onPress={() => router.push(`/restaurant/${restaurant.id}`)}
               />
-            ))
-          )}
+            </View>
+          ))}
+        </View>
+      );
+    }
+
+    return restaurants?.map((restaurant) => (
+      <RestaurantCard
+        key={restaurant.id}
+        restaurant={restaurant}
+        onPress={() => router.push(`/restaurant/${restaurant.id}`)}
+        style={{ marginHorizontal: theme.spacing.lg }}
+      />
+    ));
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.responsiveWrapper}>
+          <View style={styles.topBar}>
+            <Logo size="md" />
+            <TouchableOpacity style={styles.notificationButton}>
+              <Bell size={24} color={theme.colors.text} />
+            </TouchableOpacity>
+          </View>
+          {renderHeader()}
+          {renderSearchBar()}
+
+          {/* Promotional Banner */}
+          <View style={styles.bannerContainer}>
+            <ImageWithPlaceholder
+              source={bannerSource}
+              style={styles.bannerImage}
+            />
+            <View style={styles.bannerOverlay}>
+              <Text style={styles.bannerTitle}>50% OFF</Text>
+              <Text style={styles.bannerSubtitle}>On your first order</Text>
+              <TouchableOpacity style={styles.bannerButton}>
+                <Text style={styles.bannerButtonText}>Order Now</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {renderCategories()}
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Recommended Restaurants</Text>
+            {renderRestaurantList()}
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -122,6 +150,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
+  },
+  responsiveWrapper: {
+    maxWidth: 1200,
+    alignSelf: 'center',
+    width: '100%',
   },
   header: {
     flexDirection: 'row',
@@ -182,7 +215,7 @@ const styles = StyleSheet.create({
   },
   bannerContainer: {
     marginHorizontal: theme.spacing.lg,
-    height: 150,
+    height: 200,
     borderRadius: theme.radius.lg,
     overflow: 'hidden',
     position: 'relative',
@@ -200,7 +233,7 @@ const styles = StyleSheet.create({
   },
   bannerTitle: {
     color: theme.colors.white,
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: theme.typography.fontWeight.bold,
   },
   bannerSubtitle: {
@@ -212,13 +245,13 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.primary,
     alignSelf: 'flex-start',
     paddingHorizontal: theme.spacing.md,
-    paddingVertical: 6,
+    paddingVertical: 8,
     borderRadius: theme.radius.xs,
   },
   bannerButtonText: {
     color: theme.colors.white,
     fontWeight: theme.typography.fontWeight.bold,
-    fontSize: 12,
+    fontSize: 14,
   },
   section: {
     marginBottom: theme.spacing.xl,
@@ -232,6 +265,15 @@ const styles = StyleSheet.create({
   },
   categoriesContainer: {
     paddingLeft: theme.spacing.lg,
+  },
+  gridContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: theme.spacing.lg / 2,
+  },
+  gridItem: {
+    paddingHorizontal: theme.spacing.lg / 2,
+    marginBottom: theme.spacing.md,
   },
   loadingText: {
     textAlign: 'center',

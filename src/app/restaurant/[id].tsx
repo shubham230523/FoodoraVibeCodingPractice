@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   SectionList,
-  Dimensions,
   ActivityIndicator,
   ScrollView
 } from 'react-native';
@@ -15,25 +14,26 @@ import { theme } from '../../theme/theme';
 import { useRestaurant } from '../../features/restaurant/hooks/useRestaurants';
 import { useMenu } from '../../features/menu/hooks/useMenu';
 import { FoodCard } from '../../components/food/FoodCard';
-import { ChevronLeft, Search, Heart, Share2, Info, Star, Clock } from 'lucide-react-native';
+import { ChevronLeft, Search, Heart, Share2, Star, Clock, ShoppingBag } from 'lucide-react-native';
 import { useFavoriteStore } from '../../store/favoriteStore';
 import { useCartStore } from '../../store/cartStore';
-import { ImageWithPlaceholder } from '../../components/common/ImageWithPlaceholder';
-
-const { width } = Dimensions.get('window');
+import { useResponsive } from '../../hooks/useResponsive';
+import { Button } from '../../components/common/Button';
 
 export default function RestaurantDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const { isLargeScreen } = useResponsive();
 
   const { data: restaurant, isLoading: isResLoading } = useRestaurant(id!);
   const { data: menu, isLoading: isMenuLoading } = useMenu(id!);
 
   const { toggleFavorite, isFavorite } = useFavoriteStore();
-  const { items, getTotals } = useCartStore();
+  const { items, getTotals, restaurantId } = useCartStore();
   const totals = getTotals();
 
   const favorite = isFavorite(id!);
+  const isCorrectRestaurant = restaurantId === id;
 
   const menuSections = useMemo(() => {
     if (!menu) return [];
@@ -53,6 +53,37 @@ export default function RestaurantDetailScreen() {
   }
 
   if (!restaurant) return null;
+
+  const renderCartSidebar = () => {
+    if (!isCorrectRestaurant || items.length === 0) return null;
+
+    return (
+      <View style={styles.sidebar}>
+        <View style={styles.sidebarCard}>
+          <Text style={styles.sidebarTitle}>Your Cart</Text>
+          <ScrollView style={styles.sidebarItems}>
+            {items.map(item => (
+              <View key={item.id} style={styles.sidebarItem}>
+                <Text style={styles.sidebarItemName} numberOfLines={1}>{item.name} x {item.quantity}</Text>
+                <Text style={styles.sidebarItemPrice}>₹{item.price * item.quantity}</Text>
+              </View>
+            ))}
+          </ScrollView>
+          <View style={styles.sidebarFooter}>
+            <View style={styles.sidebarTotalRow}>
+              <Text style={styles.sidebarTotalLabel}>Total</Text>
+              <Text style={styles.sidebarTotalValue}>₹{totals.total}</Text>
+            </View>
+            <Button
+              title="View Cart"
+              onPress={() => router.push('/cart')}
+              style={styles.sidebarButton}
+            />
+          </View>
+        </View>
+      </View>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -76,71 +107,77 @@ export default function RestaurantDetailScreen() {
         </View>
       </View>
 
-      <SectionList
-        sections={menuSections}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <FoodCard
-            item={item}
-            restaurantInfo={{ id: restaurant.id, name: restaurant.name, image: restaurant.image }}
-            onPress={() => router.push(`/food/${item.id}`)}
-          />
-        )}
-        renderSectionHeader={({ section: { title } }) => (
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>{title}</Text>
-          </View>
-        )}
-        ListHeaderComponent={() => (
-          <View style={styles.resInfoContainer}>
-            <View style={styles.resHeader}>
-              <View>
-                <Text style={styles.resName}>{restaurant.name}</Text>
-                <Text style={styles.resCuisines}>{restaurant.cuisines.join(', ')}</Text>
-                <Text style={styles.resAddress}>{restaurant.address}</Text>
-              </View>
-              <View style={styles.ratingBadge}>
-                <View style={styles.ratingRow}>
-                  <Text style={styles.ratingVal}>{restaurant.rating}</Text>
-                  <Star size={12} color={theme.colors.white} fill={theme.colors.white} />
-                </View>
-                <Text style={styles.reviewCount}>{restaurant.reviewCount}+ ratings</Text>
-              </View>
-            </View>
-
-            <View style={styles.deliveryInfo}>
-              <View style={styles.infoItem}>
-                <Clock size={16} color={theme.colors.text} />
-                <Text style={styles.infoText}>{restaurant.deliveryTime} mins</Text>
-              </View>
-              <View style={styles.infoItem}>
-                <Text style={styles.infoText}>₹{restaurant.priceForTwo} for two</Text>
-              </View>
-            </View>
-
-            {restaurant.offers.length > 0 && (
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.offersList}>
-                {restaurant.offers.map((offer) => (
-                  <View key={offer.id} style={styles.offerCard}>
-                    <Text style={styles.offerTitle}>{offer.title}</Text>
-                    <Text style={styles.offerDesc}>{offer.description}</Text>
-                    <Text style={styles.offerCode}>USE {offer.code}</Text>
-                  </View>
-                ))}
-              </ScrollView>
+      <View style={styles.responsiveContent}>
+        <View style={styles.mainContent}>
+          <SectionList
+            sections={menuSections}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <FoodCard
+                item={item}
+                restaurantInfo={{ id: restaurant.id, name: restaurant.name, image: restaurant.image }}
+                onPress={() => router.push(`/food/${item.id}`)}
+              />
             )}
+            renderSectionHeader={({ section: { title } }) => (
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>{title}</Text>
+              </View>
+            )}
+            ListHeaderComponent={() => (
+              <View style={styles.resInfoContainer}>
+                <View style={styles.resHeader}>
+                  <View>
+                    <Text style={styles.resName}>{restaurant.name}</Text>
+                    <Text style={styles.resCuisines}>{restaurant.cuisines.join(', ')}</Text>
+                    <Text style={styles.resAddress}>{restaurant.address}</Text>
+                  </View>
+                  <View style={styles.ratingBadge}>
+                    <View style={styles.ratingRow}>
+                      <Text style={styles.ratingVal}>{restaurant.rating}</Text>
+                      <Star size={12} color={theme.colors.white} fill={theme.colors.white} />
+                    </View>
+                    <Text style={styles.reviewCount}>{restaurant.reviewCount}+ ratings</Text>
+                  </View>
+                </View>
 
-            <View style={styles.menuTitleContainer}>
-              <Text style={styles.menuTitle}>MENU</Text>
-              <View style={styles.menuUnderline} />
-            </View>
-          </View>
-        )}
-        stickySectionHeadersEnabled={true}
-        contentContainerStyle={styles.listContent}
-      />
+                <View style={styles.deliveryInfo}>
+                  <View style={styles.infoItem}>
+                    <Clock size={16} color={theme.colors.text} />
+                    <Text style={styles.infoText}>{restaurant.deliveryTime} mins</Text>
+                  </View>
+                  <View style={styles.infoItem}>
+                    <Text style={styles.infoText}>₹{restaurant.priceForTwo} for two</Text>
+                  </View>
+                </View>
 
-      {items.length > 0 && (
+                {restaurant.offers.length > 0 && (
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.offersList}>
+                    {restaurant.offers.map((offer) => (
+                      <View key={offer.id} style={styles.offerCard}>
+                        <Text style={styles.offerTitle}>{offer.title}</Text>
+                        <Text style={styles.offerDesc}>{offer.description}</Text>
+                        <Text style={styles.offerCode}>USE {offer.code}</Text>
+                      </View>
+                    ))}
+                  </ScrollView>
+                )}
+
+                <View style={styles.menuTitleContainer}>
+                  <Text style={styles.menuTitle}>MENU</Text>
+                  <View style={styles.menuUnderline} />
+                </View>
+              </View>
+            )}
+            stickySectionHeadersEnabled={true}
+            contentContainerStyle={styles.listContent}
+          />
+        </View>
+
+        {isLargeScreen && renderCartSidebar()}
+      </View>
+
+      {!isLargeScreen && items.length > 0 && isCorrectRestaurant && (
         <TouchableOpacity
           style={styles.cartBar}
           onPress={() => router.push('/cart')}
@@ -160,15 +197,75 @@ export default function RestaurantDetailScreen() {
   );
 }
 
-// Simple fallback for ShoppingBag if not imported correctly
-const ShoppingBag = ({ size, color, style }: any) => (
-  <View style={[{ width: size, height: size, backgroundColor: 'transparent' }, style]} />
-);
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
+  },
+  responsiveContent: {
+    flex: 1,
+    flexDirection: 'row',
+    maxWidth: 1200,
+    alignSelf: 'center',
+    width: '100%',
+  },
+  mainContent: {
+    flex: 2,
+  },
+  sidebar: {
+    flex: 1,
+    padding: theme.spacing.lg,
+    maxWidth: 350,
+  },
+  sidebarCard: {
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.lg,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    maxHeight: 500,
+    ...theme.shadows.md,
+  },
+  sidebarTitle: {
+    fontSize: 18,
+    fontWeight: theme.typography.fontWeight.bold,
+    marginBottom: theme.spacing.md,
+  },
+  sidebarItems: {
+    marginBottom: theme.spacing.md,
+  },
+  sidebarItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: theme.spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+  },
+  sidebarItemName: {
+    flex: 1,
+    fontSize: 14,
+  },
+  sidebarItemPrice: {
+    fontWeight: theme.typography.fontWeight.semibold,
+  },
+  sidebarFooter: {
+    marginTop: 'auto',
+  },
+  sidebarTotalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: theme.spacing.md,
+  },
+  sidebarTotalLabel: {
+    fontSize: 16,
+    fontWeight: theme.typography.fontWeight.bold,
+  },
+  sidebarTotalValue: {
+    fontSize: 16,
+    fontWeight: theme.typography.fontWeight.bold,
+  },
+  sidebarButton: {
+    width: '100%',
   },
   loadingContainer: {
     flex: 1,

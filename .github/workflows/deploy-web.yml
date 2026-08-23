@@ -34,7 +34,9 @@ jobs:
         run: npx expo export --platform web --clear
 
       - name: Debug Output
-        run: ls -R ./dist
+        run: |
+          ls -R ./dist
+          grep "src=" ./dist/index.html | head -n 5
 
       - name: Disable Jekyll
         run: touch ./dist/.nojekyll
